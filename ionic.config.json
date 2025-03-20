@@ -1,0 +1,7 @@
+{
+  "name": "tft-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
