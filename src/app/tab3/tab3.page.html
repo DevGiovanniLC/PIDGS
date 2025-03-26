@@ -1,0 +1,43 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Todo App</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding">
+  
+    <ion-item>
+      <ion-input
+        placeholder="Nueva tarea"
+        [(ngModel)]="newTodoText"
+        (keyup.enter)="addTodo()"
+      ></ion-input>
+      <ion-button (click)="addTodo()">Agregar</ion-button>
+    </ion-item>
+  
+    <ion-list>
+      <ion-item *ngFor="let todo of todos">
+        <ion-checkbox
+          slot="start"
+          [checked]="todo.done"
+          (ionChange)="toggleTodo(todo)"
+        ></ion-checkbox>
+  
+        <ion-label [ngClass]="{ 'completed': todo.done }">
+          {{ todo.text }}
+        </ion-label>
+  
+        <!-- Botón para eliminar tarea -->
+        <ion-button
+          slot="end"
+          fill="clear"
+          color="danger"
+          (click)="deleteTodo(todo)"
+        >
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  
+  </ion-content>
+  
