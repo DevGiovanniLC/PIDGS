@@ -9,7 +9,6 @@ import { Todo } from '../models/todo.model';
 @Component({
   standalone: true,
   selector: 'app-tab3',
-  standalone: true,
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
 
