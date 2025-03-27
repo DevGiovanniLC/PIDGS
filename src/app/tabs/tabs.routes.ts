@@ -7,10 +7,10 @@ export const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
+        path: 'reminder',
         loadComponent: () =>
-          import('../tab1/tab1.page').then((m) => m.Tab1Page),
-      },
+          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
+      },      
       {
         path: 'tab2',
         loadComponent: () =>
@@ -23,14 +23,14 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
-        pathMatch: 'full',
+        loadComponent: () =>
+          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
       },
     ],
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('../reminder/reminder.component').then((m) => m.ReminderComponent),
   },
 ];
