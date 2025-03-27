@@ -7,7 +7,7 @@ export const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'reminder',
+        path: 'tab1',
         loadComponent: () =>
           import('../reminder/reminder.component').then((m) => m.ReminderComponent),
       },      
@@ -30,7 +30,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    loadComponent: () =>
-      import('../reminder/reminder.component').then((m) => m.ReminderComponent),
+    redirectTo: '/tabs/tab1',
+    pathMatch: 'full',
   },
 ];
