@@ -10,4 +10,22 @@
       <ion-label>To-Do</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
-</ion-tabs>
+</ion-tabs>  
+
+<div class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
+  <div class="flex justify-around">
+    <a routerLink="/tabs/tab1" href="tabs/tab1" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-blue-500 transition-colors duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 11h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2z" />
+      </svg>
+      <span class="text-xs font-medium">Reminders</span>
+    </a>
+
+    <a routerLink="/tabs/tab3" href="tabs/tab3" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-blue-500 transition-colors duration-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span class="text-xs font-medium">To-Do</span>
+    </a>
+  </div>
+</div>
