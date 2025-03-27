@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -6,10 +7,12 @@ import { TodoService } from '../services/todo.service';
 import { Todo } from '../models/todo.model';
 
 @Component({
+  standalone: true,
   selector: 'app-tab3',
   standalone: true,
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
+
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class Tab3Page implements OnInit {
