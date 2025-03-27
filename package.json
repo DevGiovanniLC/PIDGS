@@ -36,6 +36,7 @@
     "@ionic/angular": "^8.4.3",
     "@tailwindcss/vite": "^4.0.4",
     "ionicons": "^7.0.0",
+    "json-server": "^1.0.0-beta.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.0.4",
     "tslib": "^2.3.0",
