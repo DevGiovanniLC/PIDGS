@@ -40,19 +40,4 @@
       Nuevo Reminder
     </button>
   </div>
-  
-  <!-- Modal para agregar un nuevo reminder -->
-  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
-    <div class="p-4">
-      <h2 class="text-xl font-semibold mb-2 text-blue-500">Nuevo Reminder</h2>
-      <div class="flex flex-col">
-        <input [(ngModel)]="newReminder.title" placeholder="Título" class="border p-2 mb-2" />
-        <textarea [(ngModel)]="newReminder.description" placeholder="Descripción" class="border p-2 mb-2"></textarea>
-        <div class="flex justify-end space-x-2">
-          <button (click)="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
-          <button (click)="addReminder()" class="bg-blue-500 text-white px-4 py-2 rounded">Agregar</button>
-        </div>
-      </div>
-    </div>
-  </ion-modal>
 </div>
