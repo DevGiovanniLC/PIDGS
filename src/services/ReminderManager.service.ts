@@ -8,38 +8,26 @@ import { LocalStorageProvider } from 'src/app/providers/LocalStorageProvider';
 })
 export class ReminderManagerService {
 
-  DataProvider: DataProvider = new LocalStorageProvider();
-  reminders: Reminder[] = [];
+  DataProvider: DataProvider
 
-  constructor() { }
+  constructor() {
+    this.DataProvider = new LocalStorageProvider();
+  }
 
   addReminder(reminder: Reminder) {
-    this.DataProvider.addReminder(reminder).then(wasAdded => {
-      if (wasAdded) this.reminders.push(reminder);
-    });
+    this.DataProvider.addReminder(reminder)
   }
 
   async getReminders() {
-    if (this.reminders.length === 0) await this.DataProvider.getReminders()
-
-
-    return this.reminders;
+    return  await this.DataProvider.getReminders();
   }
 
   deleteReminder(reminder: Reminder) {
-    if (this.reminders.length === 0) return;
-
-    this.DataProvider.deleteReminder(reminder).then(wasDeleted => {
-      if (wasDeleted) this.reminders = this.reminders.filter(r => r.id !== reminder.id);
-    });
+    this.DataProvider.deleteReminder(reminder)
   }
 
   updateReminder(reminder: Reminder) {
-    if (this.reminders.length === 0) return;
-
-    this.DataProvider.addReminder(reminder).then(wasUpdated => {
-      if (wasUpdated) this.reminders = this.reminders.map(r => r.id === reminder.id ? reminder : r);
-    });
+    this.DataProvider.updateReminder(reminder)
   }
 
 }

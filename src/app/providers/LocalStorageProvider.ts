@@ -2,8 +2,9 @@ import { DataProvider } from "../interfaces/DataProvider";
 import { Reminder } from "../model/Reminder";
 
 export class LocalStorageProvider implements DataProvider {
+
   getReminders(): Promise<Reminder[]> {
-    localStorage.setItem('reminders', JSON.stringify([]));
+    if (!localStorage.getItem('reminders')) localStorage.setItem('reminders', JSON.stringify([]));
     return Promise.resolve(JSON.parse(localStorage.getItem('reminders') || '[]'));
   }
 
@@ -15,10 +16,18 @@ export class LocalStorageProvider implements DataProvider {
   }
 
   deleteReminder(reminder: Reminder): Promise<boolean> {
-    const reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
-    reminders.splice(reminders.indexOf(reminder), 1);
-    localStorage.setItem('reminders', JSON.stringify(reminders));
+    const reminders: Reminder[] = JSON.parse(localStorage.getItem('reminders') || '[]');
+    const deletedReminders = reminders.filter(r => r.id !== reminder.id);
+    localStorage.setItem('reminders', JSON.stringify(deletedReminders));
     return Promise.resolve(true);
   }
+
+  updateReminder(reminder: Reminder): Promise<boolean> {
+    const reminders: Reminder[] = JSON.parse(localStorage.getItem('reminders') || '[]');
+    const updatedReminders = reminders.map(r => r.id === reminder.id ? reminder : r);
+    localStorage.setItem('reminders', JSON.stringify(updatedReminders));
+    return Promise.resolve(true);
+  }
+
 
 }

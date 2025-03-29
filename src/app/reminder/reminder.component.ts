@@ -1,17 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, Signal } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewReminderModalComponent } from '../creating-new-reminder/creating-new-reminder.component';
 import { EditReminderModalComponent } from '../editing-reminder-modal/editing-reminder-modal.component';
+import { ReminderManagerService } from 'src/services/ReminderManager.service';
+import { Reminder } from '../model/Reminder';
 
-interface Reminder {
-  id: number;
-  title: string;
-  description: string;
-  date: Date;
-  periodicity?: string; // Ejemplo: 'none', 'daily', 'weekly', 'monthly'
-}
 
 @Component({
   selector: 'app-reminder',
@@ -24,7 +19,7 @@ interface Reminder {
       <h1 class="text-2xl font-bold mb-4 text-blue-500">Mis Reminders</h1>
 
       <!-- Lista de reminders -->
-      <div *ngFor="let reminder of reminders" class="p-4 border rounded mb-2 flex justify-between items-center" (click)="openEditModal(reminder)">
+      <div *ngFor="let reminder of reminders()" class="p-4 border rounded mb-2 flex justify-between items-center" (click)="openEditModal(reminder)">
         <div>
           <h2 class="text-xl font-semibold">{{ reminder.title }}</h2>
           <p>{{ reminder.description }}</p>
@@ -56,28 +51,40 @@ interface Reminder {
     </div>
   `
 })
-export class ReminderComponent {
-  reminders: Reminder[] = [
-    { id: 1, title: 'Comprar leche', description: 'Recordar comprar leche en el súper', date: new Date(), periodicity: 'none' },
-    { id: 2, title: 'Llamar al doctor', description: 'Cita médica a las 3 PM', date: new Date(), periodicity: 'none' }
-  ];
+export class ReminderComponent implements OnInit {
+  reminders = signal<Reminder[]>([]);
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private reminderManager: ReminderManagerService) { }
+
+  ngOnInit(): void {
+    this.loadReminders();
+  }
+
+  private async loadReminders() {
+    this.reminders.set(await this.reminderManager.getReminders());
+  }
 
   async openModal() {
+
     const modal = await this.modalController.create({
       component: NewReminderModalComponent
     });
+
     await modal.present();
+
     const { data, role } = await modal.onDidDismiss();
+
     if (role === 'confirm' && data) {
+
       // Aseguramos que se definan los nuevos campos (date y periodicity)
-      const newReminder: Reminder = { 
-        ...data, 
-        id: this.reminders.length + 1, 
-        periodicity: data.periodicity || 'none' 
+      const newReminder: Reminder = {
+        id: this.reminders().length + 1,
+        ...data,
+        periodicity: data.periodicity || 'none'
       };
-      this.reminders.push(newReminder);
+
+      this.reminderManager.addReminder(newReminder);
+      this.reminders.update(reminders => [...reminders, newReminder]);
     }
   }
 
@@ -89,15 +96,18 @@ export class ReminderComponent {
     await modal.present();
     const { data, role } = await modal.onDidDismiss();
     if (role === 'confirm' && data) {
-      const index = this.reminders.findIndex(r => r.id === reminder.id);
+      const index = this.reminders().findIndex(r => r.id === reminder.id);
       if (index !== -1) {
+        const updatedReminder = data as Reminder;
         // Actualizamos el reminder con los nuevos datos, manteniendo el mismo id
-        this.reminders[index] = { ...data, id: reminder.id };
+        this.reminders.update(reminders => reminders.map(r => r.id === reminder.id ? updatedReminder : r));
+        this.reminderManager.updateReminder(updatedReminder);
       }
     }
   }
 
   deleteReminder(reminder: Reminder) {
-    this.reminders = this.reminders.filter(r => r.id !== reminder.id);
+    this.reminders.update(reminders => reminders.filter(r => r.id !== reminder.id));
+    this.reminderManager.deleteReminder(reminder);
   }
 }
