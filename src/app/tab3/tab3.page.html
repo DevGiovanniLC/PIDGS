@@ -27,6 +27,7 @@
         placeholder="Nueva tarea"
         [(ngModel)]="newTodoText"
         (keyup.enter)="addTodo()"
+
         class="w-full sm:flex-grow border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
       />
 
@@ -48,6 +49,7 @@
         Agregar
       </button>
     </div>
+
 
     <!-- LISTA DE TAREAS -->
     <div *ngFor="let category of categories" class="mt-8">
