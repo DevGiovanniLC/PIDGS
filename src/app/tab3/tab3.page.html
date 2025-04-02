@@ -1,21 +1,47 @@
-<div class=" bg-gray-100 min-h-screen shadow-lg rounded-lg overflow-hidden">
+<div class="bg-gray-100 min-h-screen shadow-lg rounded-lg overflow-hidden">
   <!-- Header -->
   <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
     <h1 class="text-2xl font-semibold text-white text-center">To-Do</h1>
   </div>
 
-  <div class="p-4">
-    <div class="flex items-center space-x-2">
+  <div class="p-4 space-y-6">
+    <!-- NUEVA CATEGORÍA -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+      <input 
+        [(ngModel)]="newCategory" 
+        placeholder="Nueva categoría" 
+        class="w-full sm:flex-grow border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+      />
+      <button 
+        (click)="addCategory()"
+        class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition transform hover:scale-105"
+      >
+        Añadir Categoría
+      </button>
+    </div>
+
+    <!-- NUEVA TAREA -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
       <input 
         type="text" 
         placeholder="Nueva tarea"
         [(ngModel)]="newTodoText"
         (keyup.enter)="addTodo()"
-        class="border border-gray-300 rounded p-3 flex-grow text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
+
+        class="w-full sm:flex-grow border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
       />
+
+      <select 
+        [(ngModel)]="newTodoCategory"
+        class="w-full sm:w-auto border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+      >
+        <option value="" disabled selected>Selecciona categoría</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+
       <button 
         (click)="addTodo()"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded transition transform hover:scale-105 flex items-center"
+        class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition transform hover:scale-105 flex items-center justify-center"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
@@ -24,29 +50,37 @@
       </button>
     </div>
 
-    <ul class="mt-6 space-y-4">
-      <li *ngFor="let todo of todos" class="flex items-center justify-between bg-white p-3 rounded-lg shadow transition transform hover:scale-105">
-        <div class="flex items-center">
-          <input 
-            type="checkbox" 
-            [checked]="todo.done" 
-            (change)="toggleTodo(todo)" 
-            class="mr-3 h-5 w-5 accent-blue-500"
-          />
-          <span [ngClass]="{ 'line-through text-gray-400': todo.done }" class="text-gray-800">
-            {{ todo.text }}
-          </span>
-        </div>
-        <button 
-          (click)="deleteTodo(todo)" 
-          class="text-red-500 hover:text-red-700 transition transform hover:rotate-12"
+
+    <!-- LISTA DE TAREAS -->
+    <div *ngFor="let category of categories" class="mt-8">
+      <h2 class="text-lg font-bold text-purple-600 mb-3 border-b pb-1">{{ category }}</h2>
+
+      <ul class="space-y-3">
+        <li 
+          *ngFor="let todo of groupedTodos[category]" 
+          class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-3 rounded-lg shadow hover:shadow-md transition"
         >
-          <!-- Ícono de basura (trash) -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9 2a1 1 0 011 1v1h3a1 1 0 110 2h-1v9a2 2 0 01-2 2H8a2 2 0 01-2-2V6H5a1 1 0 110-2h3V3a1 1 0 011-1zM7 6v9a1 1 0 001 1h2a1 1 0 001-1V6H7z" clip-rule="evenodd" />
-          </svg>
-        </button>
-      </li>
-    </ul>
+          <div class="flex items-center mb-2 sm:mb-0">
+            <input 
+              type="checkbox" 
+              [checked]="todo.done" 
+              (change)="toggleTodo(todo)" 
+              class="mr-3 h-5 w-5 accent-purple-500"
+            />
+            <span [ngClass]="{ 'line-through text-gray-400': todo.done }" class="text-gray-800 text-sm sm:text-base">
+              {{ todo.text }}
+            </span>
+          </div>
+          <button 
+            (click)="deleteTodo(todo)" 
+            class="text-red-500 hover:text-red-700 transition transform hover:rotate-12 self-end sm:self-auto"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 011 1v1h3a1 1 0 110 2h-1v9a2 2 0 01-2 2H8a2 2 0 01-2-2V6H5a1 1 0 110-2h3V3a1 1 0 011-1zM7 6v9a1 1 0 001 1h2a1 1 0 001-1V6H7z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
