@@ -1,32 +1,62 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Todo } from '../models/todo.model';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoService {
-  private apiUrl = 'http://localhost:3000/todos';
+  private storageKey = 'todos';
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
-  getTodos(): Observable<Todo[]> {
-    return this.http.get<Todo[]>(this.apiUrl);
-  }
-
-  addTodo(text: string): Observable<Todo> {
-    return this.http.post<Todo>(this.apiUrl, { text });
-  }
-
-  toggleTodo(todo: Todo): Observable<Todo> {
-    return this.http.put<Todo>(`${this.apiUrl}/${todo.id}`, {
-      ...todo,
-      done: !todo.done
+  private generateUUID(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
     });
   }
 
-  deleteTodo(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  private getStoredTodos(): Todo[] {
+    const todosJson = localStorage.getItem(this.storageKey);
+    return todosJson ? JSON.parse(todosJson) : [];
+  }
+
+  private setStoredTodos(todos: Todo[]): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(todos));
+  }
+
+  getTodos(): Observable<Todo[]> {
+    return of(this.getStoredTodos());
+  }
+
+  addTodo(text: string, category?: string): Observable<Todo> {
+    const todos = this.getStoredTodos();
+    const newTodo: Todo = {
+      id: this.generateUUID(),
+      text,
+      done: false,
+      category
+    };
+    todos.push(newTodo);
+    this.setStoredTodos(todos);
+    return of(newTodo);
+  }
+  
+
+  toggleTodo(todo: Todo): Observable<Todo> {
+    const todos = this.getStoredTodos().map(t =>
+      t.id === todo.id ? { ...t, done: !t.done } : t
+    );
+    this.setStoredTodos(todos);
+    const updatedTodo = todos.find(t => t.id === todo.id)!;
+    return of(updatedTodo);
+  }
+
+  deleteTodo(id: string): Observable<void> {
+    const todos = this.getStoredTodos().filter(t => t.id !== id);
+    this.setStoredTodos(todos);
+    return of(void 0);
   }
 }
