@@ -9,8 +9,8 @@ export const routes: Routes = [
       {
         path: 'tab1',
         loadComponent: () =>
-          import('../tab1/tab1.page').then((m) => m.Tab1Page),
-      },
+          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
+      },      
       {
         path: 'tab2',
         loadComponent: () =>
@@ -23,8 +23,8 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
-        pathMatch: 'full',
+        loadComponent: () =>
+          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
       },
     ],
   },

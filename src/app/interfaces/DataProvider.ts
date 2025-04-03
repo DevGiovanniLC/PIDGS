@@ -6,4 +6,6 @@ export interface DataProvider {
   addReminder(reminder: Reminder): Promise<boolean>;
 
   deleteReminder(reminder: Reminder): Promise<boolean>;
+
+  updateReminder(reminder: Reminder): Promise<boolean>;
 }
