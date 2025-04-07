@@ -21,7 +21,7 @@ export class Tab3Page implements OnInit {
   newTodoCategory: string = '';
   newCategory: string = '';
 
-  categories: string[] = ['Trabajo', 'Personal', 'Estudio']; // Puedes hacer esto dinámico también
+  categories: string[] = ['Work', 'Personal', 'Study']; // Puedes hacer esto dinámico también
   groupedTodos: { [category: string]: Todo[] } = {};
 
   constructor(private todoService: TodoService) {}
