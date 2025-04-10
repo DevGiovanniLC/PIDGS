@@ -9,22 +9,22 @@ export const routes: Routes = [
       {
         path: 'tab1',
         loadComponent: () =>
-          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
-      },      
+          import('../pages/tab1/components/reminder/reminder.component').then((m) => m.ReminderComponent),
+      },
       {
         path: 'tab2',
         loadComponent: () =>
-          import('../tab2/tab2.page').then((m) => m.Tab2Page),
+          import('../pages/tab2/tab2.page').then((m) => m.Tab2Page),
       },
       {
         path: 'tab3',
         loadComponent: () =>
-          import('../tab3/tab3.page').then((m) => m.Tab3Page),
+          import('../pages/tab3/tab3.page').then((m) => m.Tab3Page),
       },
       {
         path: '',
         loadComponent: () =>
-          import('../reminder/reminder.component').then((m) => m.ReminderComponent),
+          import('../pages/tab1/components/reminder/reminder.component').then((m) => m.ReminderComponent),
       },
     ],
   },
