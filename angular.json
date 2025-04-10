@@ -38,6 +38,7 @@
             "styles": [
               "src/global.scss",
               "src/theme/variables.scss",
+              "node_modules/font-awesome/css/font-awesome.min.css",
               {
                 "input": "node_modules/@ionic/angular/css/core.css"
               },

@@ -1,6 +1,14 @@
 <div class="bg-gray-50 min-h-screen font-sans">
-  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
-    <h1 class="text-2xl font-semibold text-white text-center">Sign In</h1>
+  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md flex items-center relative">
+
+    <button (click)="goBack()" class="text-white p-2 rounded-md absolute left-4 top-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <h1 class="text-2xl font-semibold text-white text-center flex-grow">Sign In</h1>
+
   </div>
 
   <div class="bg-gray-50 px-6 py-10 text-center space-y-6">

@@ -35,6 +35,7 @@
     "@capacitor/status-bar": "7.0.0",
     "@ionic/angular": "^8.4.3",
     "@tailwindcss/vite": "^4.0.4",
+    "font-awesome": "^4.7.0",
     "ionicons": "^7.0.0",
     "json-server": "^1.0.0-beta.3",
     "rxjs": "~7.8.0",
