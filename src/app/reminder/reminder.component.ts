@@ -1,11 +1,14 @@
-import { Component, OnInit, signal, Signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewReminderModalComponent } from '../creating-new-reminder/creating-new-reminder.component';
 import { EditReminderModalComponent } from '../editing-reminder-modal/editing-reminder-modal.component';
 import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
-import { Reminder } from '../models/Reminder';
+import { Reminder } from '@models/Reminder';
+import { NotificationService } from '../services/Notification.service';
+import { Notification } from '@models/Notification';
+
 
 
 @Component({
@@ -54,10 +57,15 @@ import { Reminder } from '../models/Reminder';
 export class ReminderComponent implements OnInit {
   reminders = signal<Reminder[]>([]);
 
-  constructor(private modalController: ModalController, private reminderManager: ReminderManagerService) { }
+  constructor(
+    private modalController: ModalController,
+    private reminderManager: ReminderManagerService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit(): void {
     this.loadReminders();
+    this.notificationService.requestPermissions();
   }
 
   private async loadReminders() {
@@ -83,8 +91,17 @@ export class ReminderComponent implements OnInit {
         periodicity: data.periodicity || 'none'
       };
 
+
       this.reminderManager.addReminder(newReminder);
       this.reminders.update(reminders => [...reminders, newReminder]);
+
+      const notification: Notification = {
+        title: newReminder.title,
+        body: newReminder.description,
+        scheduleTime: new Date(newReminder.date).toISOString()
+      };
+
+      const notificationScheduled = await this.notificationService.scheduleNotification(notification);
     }
   }
 
@@ -102,6 +119,14 @@ export class ReminderComponent implements OnInit {
         // Actualizamos el reminder con los nuevos datos, manteniendo el mismo id
         this.reminders.update(reminders => reminders.map(r => r.id === reminder.id ? updatedReminder : r));
         this.reminderManager.updateReminder(updatedReminder);
+
+        const notification: Notification = {
+          title: updatedReminder.title,
+          body: updatedReminder.description,
+          scheduleTime: new Date(updatedReminder.date).toISOString()
+        };
+
+        const notificationScheduled = await this.notificationService.scheduleNotification(notification);
       }
     }
   }

@@ -1,86 +1,172 @@
-<div class="bg-gray-100 min-h-screen shadow-lg rounded-lg overflow-hidden">
+<div class="bg-gray-50 min-h-screen relative font-sans">
   <!-- Header -->
   <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
     <h1 class="text-2xl font-semibold text-white text-center">To-Do</h1>
   </div>
 
-  <div class="p-4 space-y-6">
-    <!-- NUEVA CATEGORÍA -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-      <input 
-        [(ngModel)]="newCategory" 
-        placeholder="Nueva categoría" 
-        class="w-full sm:flex-grow border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-      />
-      <button 
-        (click)="addCategory()"
-        class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition transform hover:scale-105"
-      >
-        Añadir Categoría
-      </button>
-    </div>
+  <!-- Lista de tareas agrupadas -->
+  <div class="p-4 space-y-8">
+    <ng-container *ngFor="let category of categories">
+      <div>
+        <div class="flex items-center justify-between cursor-pointer border-b pb-1" (click)="toggleCategory(category)">
+          <h2 class="text-lg font-semibold text-gray-700">{{ category }}</h2>
+          <button class="focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 transform transition-transform duration-300"
+              [ngClass]="{ 'rotate-180': expandedCategories[category] }">
+              <path fill="currentColor" d="M10 12l-4-4h8l-4 4z" />
+            </svg>
+          </button>
+        </div>
 
-    <!-- NUEVA TAREA -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-      <input 
-        type="text" 
-        placeholder="Nueva tarea"
-        [(ngModel)]="newTodoText"
-        (keyup.enter)="addTodo()"
+        <div [ngClass]="{ 'max-h-96 opacity-100': expandedCategories[category], 'max-h-0 opacity-0': !expandedCategories[category] }"
+          class="transition-all duration-300 ease-out overflow-hidden">
+          <ul class="space-y-3 mt-2">
+            <li *ngFor="let todo of groupedTodos[category]"
+              [attr.data-id]="todo.id"
+              (touchstart)="startSwipe($event, todo.id)"
+              (touchmove)="moveSwipe($event)"
+              (touchend)="endSwipe($event, todo.id)"
+              class="relative overflow-hidden rounded-lg shadow-sm transition">
 
-        class="w-full sm:flex-grow border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-      />
+              <!-- Fondo con botón Delete -->
+              <div class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none">
+                <button (click)="deleteTodo(todo)"
+                  class="pointer-events-auto flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow focus:outline-none transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
 
-      <select 
-        [(ngModel)]="newTodoCategory"
-        class="w-full sm:w-auto border border-gray-300 rounded p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
-      >
-        <option value="" disabled selected>Selecciona categoría</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
-
-      <button 
-        (click)="addTodo()"
-        class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition transform hover:scale-105 flex items-center justify-center"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-        </svg>
-        Agregar
-      </button>
-    </div>
-
-
-    <!-- LISTA DE TAREAS -->
-    <div *ngFor="let category of categories" class="mt-8">
-      <h2 class="text-lg font-bold text-purple-600 mb-3 border-b pb-1">{{ category }}</h2>
-
-      <ul class="space-y-3">
-        <li 
-          *ngFor="let todo of groupedTodos[category]" 
-          class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-3 rounded-lg shadow hover:shadow-md transition"
-        >
-          <div class="flex items-center mb-2 sm:mb-0">
-            <input 
-              type="checkbox" 
-              [checked]="todo.done" 
-              (change)="toggleTodo(todo)" 
-              class="mr-3 h-5 w-5 accent-purple-500"
-            />
-            <span [ngClass]="{ 'line-through text-gray-400': todo.done }" class="text-gray-800 text-sm sm:text-base">
+              <!-- Contenido deslizable -->
+            <div class="flex items-center space-x-3 bg-white p-3 relative z-20 rounded-lg transition-transform duration-300 ease-in-out min-w-0"
+            [ngClass]="{ '-translate-x-36': swipedTodoId === todo.id, 'translate-x-0': swipedTodoId !== todo.id }">
+            <input type="checkbox" [checked]="todo.done" (change)="toggleTodo(todo)"
+              class="h-5 w-5 accent-indigo-500 transition-all duration-300 flex-shrink-0" />
+            <span [ngClass]="{ 'line-through text-gray-400': todo.done, 'text-gray-800': !todo.done }"
+              class="transition-all duration-300 text-base font-light break-words break-all flex-1">
               {{ todo.text }}
             </span>
-          </div>
-          <button 
-            (click)="deleteTodo(todo)" 
-            class="text-red-500 hover:text-red-700 transition transform hover:rotate-12 self-end sm:self-auto"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 011 1v1h3a1 1 0 110 2h-1v9a2 2 0 01-2 2H8a2 2 0 01-2-2V6H5a1 1 0 110-2h3V3a1 1 0 011-1zM7 6v9a1 1 0 001 1h2a1 1 0 001-1V6H7z" clip-rule="evenodd" />
+            </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Botón flotante -->
+  <div class="fixed bottom-6 right-6">
+    <button (click)="openTodoModal()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition transform hover:scale-105 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd"
+          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+          clip-rule="evenodd" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Modal: Nuevo To-Do -->
+  <div *ngIf="showTodoModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">  
+      <button (click)="closeTodoModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">New To-Do</h2>
+      <input type="text" [(ngModel)]="newTodoText" (keyup.enter)="addTodo()" placeholder="Enter task description"
+        class="w-full border border-gray-300 rounded p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition mb-4 font-light" />
+      <div class="flex items-center space-x-2">
+        <select [(ngModel)]="newTodoCategory"
+          class="w-full border border-gray-300 rounded p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-light">
+          <option value="" disabled selected>Select Category</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+        <button (click)="openCategoryModal()" class="p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition focus:outline-none"
+          title="Manage Categories">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.607 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+      <button (click)="addTodo()"
+        class="mt-6 w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 rounded transition flex items-center justify-center font-light focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+            clip-rule="evenodd" />
+        </svg>
+        Add Task
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Gestión de Categorías -->
+<div *ngIf="showCategoryModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-md relative">
+    <button (click)="closeCategoryModal()"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">Manage Categories</h2>
+    <div class="space-y-2 mb-16">
+      <ul class="space-y-2 max-h-60 overflow-y-auto">
+        <li *ngFor="let cat of categories" class="flex items-center justify-between border-b py-2">
+          <span class="text-gray-800 font-light">{{ cat }}</span>
+          <button (click)="deleteCategory(cat)" class="text-red-500 hover:text-red-700 focus:outline-none" title="Delete">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 10l4 4m0-4l-4 4M12 2a10 10 0 100 20 10 10 0 000-20z" />
             </svg>
           </button>
         </li>
       </ul>
+      <div *ngIf="isAddingInline" class="flex items-center justify-between border-b py-2 animate-fade-in">
+        <input type="text" [(ngModel)]="newCategoryInline" placeholder="New category..."
+          class="w-full text-gray-800 font-light text-sm bg-transparent focus:outline-none"
+          (keyup.enter)="saveInlineCategory()" autofocus />
+        <div class="flex items-center space-x-2 ml-2">
+          <button (click)="saveInlineCategory()" class="text-green-500 hover:text-green-700 focus:outline-none" title="Save">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                clip-rule="evenodd" />
+            </svg>
+          </button>
+          <button (click)="isAddingInline = false" class="text-gray-400 hover:text-gray-600 focus:outline-none" title="Cancel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="absolute bottom-4 right-4">
+      <button (click)="startInlineCategory()"
+        class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white p-3 rounded-full shadow-lg transition transform hover:scale-105 focus:outline-none"
+        title="New Category">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
     </div>
   </div>
+</div>
 </div>
