@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewReminderModalComponent } from '../creating-new-reminder/creating-new-reminder.component';
 import { EditReminderModalComponent } from '../editing-reminder-modal/editing-reminder-modal.component';
-import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
-import { Reminder } from '@models/Reminder';
+import { ReminderManagerService } from '../services/ReminderManager.service';
 import { NotificationService } from '../services/Notification.service';
+import { Reminder } from '@models/Reminder';
 import { Notification } from '@models/Notification';
-
 
 
 @Component({
@@ -119,14 +118,6 @@ export class ReminderComponent implements OnInit {
         // Actualizamos el reminder con los nuevos datos, manteniendo el mismo id
         this.reminders.update(reminders => reminders.map(r => r.id === reminder.id ? updatedReminder : r));
         this.reminderManager.updateReminder(updatedReminder);
-
-        const notification: Notification = {
-          title: updatedReminder.title,
-          body: updatedReminder.description,
-          scheduleTime: new Date(updatedReminder.date).toISOString()
-        };
-
-        const notificationScheduled = await this.notificationService.scheduleNotification(notification);
       }
     }
   }
