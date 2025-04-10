@@ -1,0 +1,54 @@
+<div class="bg-gray-50 min-h-screen font-sans">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
+    <h1 class="text-2xl font-semibold text-white text-center">Settings</h1>
+  </div>
+
+  <!-- Content -->
+  <div class="bg-white p-4 space-y-4">
+
+    <!-- Sign in -->
+    <ng-container *ngIf="!isAuthenticated">
+      <button (click)="goToLogin()" class="w-full flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M21.35 11.1h-9.16v2.92h5.55c-.25 1.45-1.68 4.28-5.55 4.28-3.34 0-6.06-2.75-6.06-6.1s2.72-6.1 6.06-6.1c1.9 0 3.19.82 3.92 1.53l2.66-2.66C17.39 3.49 15.05 2.5 12 2.5 6.75 2.5 2.5 6.75 2.5 12s4.25 9.5 9.5 9.5c5.5 0 9.12-3.86 9.12-9.3 0-.63-.07-1.1-.17-1.6z" />
+        </svg>
+        <span class="text-base font-light">Sign in with Google</span>
+      </button>
+    </ng-container>
+
+    <!-- Log out -->
+    <ng-container *ngIf="isAuthenticated">
+      <button (click)="logout()" class="w-full flex items-center space-x-2 border border-red-500 text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
+        </svg>
+        <span class="text-base font-light">Log out from Google</span>
+      </button>
+    </ng-container>
+
+    <!-- Sync now -->
+    <button (click)="syncNow()" class="w-full flex items-center space-x-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg shadow transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M4 20l6-6m10-10l-6 6" />
+      </svg>
+      <span class="text-base font-light">Sync now</span>
+    </button>
+
+    <!-- Auto-sync toggle -->
+    <div class="flex items-center justify-between border-b pb-2">
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span class="text-base text-gray-700 font-light">Enable Auto-Sync</span>
+      </div>
+      <label class="inline-flex items-center cursor-pointer">
+        <input type="checkbox" class="sr-only peer" [(ngModel)]="autoSync" (change)="toggleAutoSync()" />
+        <div class="w-11 h-6 bg-gray-200 peer-checked:bg-blue-600 rounded-full transition duration-300"></div>
+      </label>
+    </div>
+
+  </div>
+</div>

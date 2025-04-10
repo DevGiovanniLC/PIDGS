@@ -22,6 +22,16 @@ export const routes: Routes = [
           import('../pages/tab3/tab3.page').then((m) => m.Tab3Page),
       },
       {
+        path: 'config',
+        loadComponent: () =>
+          import('../pages/config/config.page').then((m) => m.Config),
+      },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('../pages/login/login.component').then((m) => m.LoginComponent),
+      },
+      {
         path: '',
         loadComponent: () =>
           import('../pages/tab1/components/reminder/reminder.component').then((m) => m.ReminderComponent),
