@@ -1,5 +1,5 @@
-import { DataProvider } from "../interfaces/DataProvider";
-import { Reminder } from "../model/Reminder";
+import { DataProvider } from "../../interfaces/DataProvider";
+import { Reminder } from "../../models/Reminder";
 
 export class LocalStorageProvider implements DataProvider {
 

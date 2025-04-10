@@ -1,4 +1,4 @@
-import { Reminder } from "../model/Reminder";
+import { Reminder } from "../models/Reminder";
 
 export interface DataProvider {
   getReminders(): Promise<Reminder[]>;

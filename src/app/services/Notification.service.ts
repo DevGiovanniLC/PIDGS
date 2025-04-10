@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { Notification } from '../app/model/Notification';
+import { Notification } from '../models/Notification';
 
 @Injectable({
   providedIn: 'root'

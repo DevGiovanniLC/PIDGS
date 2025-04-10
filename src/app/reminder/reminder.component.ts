@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewReminderModalComponent } from '../creating-new-reminder/creating-new-reminder.component';
 import { EditReminderModalComponent } from '../editing-reminder-modal/editing-reminder-modal.component';
-import { ReminderManagerService } from 'src/services/ReminderManager.service';
-import { Reminder } from '../model/Reminder';
+import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
+import { Reminder } from '../models/Reminder';
 
 
 @Component({

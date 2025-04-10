@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataProvider } from 'src/app/interfaces/DataProvider';
-import { Reminder } from 'src/app/model/Reminder';
-import { LocalStorageProvider } from 'src/app/providers/LocalStorageProvider';
+import { Reminder } from '@models/Reminder';
+import { LocalStorageProvider } from 'src/app/services/providers/LocalStorageProvider';
 
 @Injectable({
   providedIn: 'root'
