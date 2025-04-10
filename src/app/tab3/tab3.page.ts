@@ -16,33 +16,42 @@ export class Tab3Page implements OnInit {
   todos: Todo[] = [];
   newTodoText: string = '';
   newTodoCategory: string = '';
-  newCategory: string = '';
+  newCategoryInline: string = '';
 
-  // Categorías de ejemplo
   categories: string[] = ['Work', 'Personal', 'Study'];
   groupedTodos: { [category: string]: Todo[] } = {};
-
-  // Flags para controlar visibilidad de modales
-  showTodoModal: boolean = false;
-  showCategoryModal: boolean = false;
-  showNewCategoryModal: boolean = false;
-
-  // Control de categorías expandidas/colapsadas
   expandedCategories: { [category: string]: boolean } = {};
+
+  showTodoModal = false;
+  showCategoryModal = false;
+  isAddingInline = false;
+
+  startX = 0;
+  swipedTodoId: string | null = null;
 
   constructor(private todoService: TodoService) {}
 
   ngOnInit() {
-    // Inicialmente, todas las categorías se muestran expandidas
     this.categories.forEach(cat => this.expandedCategories[cat] = true);
     this.loadTodos();
   }
 
   loadTodos() {
-    this.todoService.getTodos().subscribe((data) => {
+    this.todoService.getTodos().subscribe(data => {
       this.todos = data;
       this.groupTodosByCategory();
     });
+  }
+
+  groupTodosByCategory() {
+    this.groupedTodos = {};
+    for (const todo of this.todos) {
+      const cat = todo.category || 'Uncategorized';
+      if (!this.groupedTodos[cat]) {
+        this.groupedTodos[cat] = [];
+      }
+      this.groupedTodos[cat].push(todo);
+    }
   }
 
   addTodo() {
@@ -50,7 +59,7 @@ export class Tab3Page implements OnInit {
     const category = this.newTodoCategory.trim();
     if (!text || !category) return;
 
-    this.todoService.addTodo(text, category).subscribe((newTodo) => {
+    this.todoService.addTodo(text, category).subscribe(newTodo => {
       this.todos.push(newTodo);
       this.newTodoText = '';
       this.newTodoCategory = '';
@@ -60,7 +69,7 @@ export class Tab3Page implements OnInit {
   }
 
   toggleTodo(todo: Todo) {
-    this.todoService.toggleTodo(todo).subscribe((updated) => {
+    this.todoService.toggleTodo(todo).subscribe(updated => {
       todo.done = updated.done;
       this.groupTodosByCategory();
     });
@@ -68,39 +77,16 @@ export class Tab3Page implements OnInit {
 
   deleteTodo(todo: Todo) {
     this.todoService.deleteTodo(todo.id).subscribe(() => {
-      this.todos = this.todos.filter((t) => t.id !== todo.id);
+      this.todos = this.todos.filter(t => t.id !== todo.id);
       this.groupTodosByCategory();
+      this.swipedTodoId = null; // Cierra el swipe después de borrar
     });
   }
 
-  groupTodosByCategory() {
-    this.groupedTodos = {};
-    for (const todo of this.todos) {
-      const cat = todo.category || 'Sin categoría';
-      if (!this.groupedTodos[cat]) {
-        this.groupedTodos[cat] = [];
-      }
-      this.groupedTodos[cat].push(todo);
-    }
+  toggleCategory(category: string) {
+    this.expandedCategories[category] = !this.expandedCategories[category];
   }
 
-  // Añade categoría desde el modal de nueva categoría
-  addCategoryFromModal() {
-    const cat = this.newCategory.trim();
-    if (cat && !this.categories.includes(cat)) {
-      this.categories.push(cat);
-      this.expandedCategories[cat] = true;
-      this.newCategory = '';
-    }
-    this.closeNewCategoryModal();
-  }
-
-  deleteCategory(category: string) {
-    this.categories = this.categories.filter(cat => cat !== category);
-    delete this.expandedCategories[category];
-  }
-
-  // Métodos para abrir/cerrar modales
   openTodoModal() {
     this.showTodoModal = true;
   }
@@ -115,20 +101,52 @@ export class Tab3Page implements OnInit {
 
   closeCategoryModal() {
     this.showCategoryModal = false;
-    // También se cierra el modal de nueva categoría, si está abierto
-    this.showNewCategoryModal = false;
+    this.isAddingInline = false;
   }
 
-  openNewCategoryModal() {
-    this.showNewCategoryModal = true;
+  startInlineCategory() {
+    this.isAddingInline = true;
+    this.newCategoryInline = '';
   }
 
-  closeNewCategoryModal() {
-    this.showNewCategoryModal = false;
+  saveInlineCategory() {
+    const cat = this.newCategoryInline.trim();
+    if (cat && !this.categories.includes(cat)) {
+      this.categories.push(cat);
+      this.expandedCategories[cat] = true;
+    }
+    this.newCategoryInline = '';
+    this.isAddingInline = false;
   }
 
-  // Alterna el estado de colapso/expansión de cada categoría
-  toggleCategory(category: string) {
-    this.expandedCategories[category] = !this.expandedCategories[category];
+  deleteCategory(category: string) {
+    this.categories = this.categories.filter(cat => cat !== category);
+    delete this.expandedCategories[category];
+    this.groupTodosByCategory();
+  }
+
+  // Swipe handlers
+  startSwipe(event: TouchEvent, todoId: string) {
+    this.startX = event.touches[0].clientX;
+  }
+
+  moveSwipe(event: TouchEvent) {
+    const currentX = event.touches[0].clientX;
+    const deltaX = this.startX - currentX;
+    if (deltaX > 50) {
+      const target = event.target as HTMLElement;
+      const id = target.closest('[data-id]')?.getAttribute('data-id') ?? null;
+      this.swipedTodoId = id;
+    }
+  }
+
+  endSwipe(event: TouchEvent, todoId: string) {
+    const endX = event.changedTouches[0].clientX;
+    const deltaX = this.startX - endX;
+
+    if (deltaX < 30) {
+      // No fue swipe real, resetear
+      this.swipedTodoId = null;
+    }
   }
 }
