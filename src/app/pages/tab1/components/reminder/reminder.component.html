@@ -1,43 +1,47 @@
-<div class="container mx-auto p-4 bg-white">
-  <!-- Título con color principal azul -->
-  <h1 class="text-2xl font-bold mb-4 text-blue-500">Mis Reminders</h1>
-
-  <!-- Lista de reminders -->
-  <div *ngFor="let reminder of reminders" class="p-4 border rounded mb-2 flex justify-between items-center">
-    <div>
-      <h2 class="text-xl font-semibold">{{ reminder.title }}</h2>
-      <p>{{ reminder.description }}</p>
-      <p class="text-gray-500 text-sm">{{ reminder.date | date:'short' }}</p>
-    </div>
-    <div class="flex space-x-2">
-      <!-- Botón de editar en amarillo con icono -->
-      <button (click)="editReminder(reminder)" class="bg-yellow-500 text-white px-2 py-1 rounded">
-        <ion-icon name="pencil-outline"></ion-icon>
-      </button>
-      <!-- Botón de eliminar en rojo con icono -->
-      <button (click)="deleteReminder(reminder)" class="bg-red-500 text-white px-2 py-1 rounded">
-        <ion-icon name="trash-outline"></ion-icon>
-      </button>
-    </div>
+<div class="bg-gray-50 min-h-screen relative font-sans">
+  
+  <!-- Encabezado con gradiente -->
+  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
+    <h1 class="text-2xl font-semibold text-white text-center">
+      Mis Reminders
+    </h1>
   </div>
-
-  <!-- Formulario para editar un reminder (visible cuando se edita) -->
-  <div *ngIf="editingReminder as edit" class="mt-6">
-    <h2 class="text-xl font-semibold mb-2 text-blue-500">Editar Reminder</h2>
-    <div class="flex flex-col">
-      <input [(ngModel)]="edit.title" placeholder="Título" class="border p-2 mb-2" />
-      <textarea [(ngModel)]="edit.description" placeholder="Descripción" class="border p-2 mb-2"></textarea>
-      <div class="flex justify-end space-x-2">
-        <button (click)="updateReminder()" class="bg-blue-500 text-white px-4 py-2 rounded">Actualizar</button>
-        <button (click)="editingReminder = null" class="bg-gray-500 text-white px-4 py-2 rounded">Cancelar</button>
+  
+  <!-- Contenedor principal centrado -->
+  <div class="max-w-3xl mx-auto p-6">
+    
+    <!-- Botón para agregar un nuevo reminder -->
+    <div class="flex justify-end mb-6">
+      <ion-button color="primary" (click)="openNewReminderModal()">
+        Nuevo Reminder
+      </ion-button>
+    </div>
+    
+    <!-- Lista de reminders -->
+    <div 
+      *ngFor="let reminder of reminders()" 
+      class="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-sm transition-all"
+      (click)="openEditReminderModal(reminder)"
+    >
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">{{ reminder.title }}</h2>
+        <p class="text-gray-700">{{ reminder.description }}</p>
+        <p class="text-gray-500 text-sm">
+          {{ reminder.date | date:'short' }}
+          <span *ngIf="reminder.periodicity && reminder.periodicity !== 'none'">
+            - {{ reminder.periodicity | titlecase }}
+          </span>
+        </p>
+      </div>
+      <div class="flex items-center space-x-2" (click)="$event.stopPropagation()">
+        <ion-button color="warning" (click)="openEditReminderModal(reminder)">
+          <ion-icon name="pencil-outline"></ion-icon>
+        </ion-button>
+        <ion-button color="danger" (click)="deleteReminder(reminder)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
       </div>
     </div>
-  </div>
-
-  <!-- Botón para agregar un nuevo reminder -->
-  <div class="mb-4">
-    <button (click)="openModal()" class="bg-blue-500 text-white px-4 py-2 rounded">
-      Nuevo Reminder
-    </button>
+    
   </div>
 </div>

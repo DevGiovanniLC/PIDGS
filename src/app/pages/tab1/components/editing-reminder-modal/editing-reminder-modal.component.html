@@ -1,3 +1,39 @@
-<p>
-  editing-reminder-modal works!
-</p>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Editar Reminder</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Título -->
+  <ion-item>
+    <ion-label position="stacked">Título</ion-label>
+    <ion-input [(ngModel)]="editedReminder.title" placeholder="Título"></ion-input>
+  </ion-item>
+
+  <!-- Descripción -->
+  <ion-item>
+    <ion-label position="stacked">Descripción</ion-label>
+    <ion-textarea [(ngModel)]="editedReminder.description" placeholder="Descripción"></ion-textarea>
+  </ion-item>
+
+  <!-- Fecha y Hora -->
+  <ion-item>
+    <ion-label position="stacked">Fecha y Hora</ion-label>
+    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" [(ngModel)]="editedReminder.date"></ion-datetime>
+  </ion-item>
+
+  <!-- Checkbox para repetir semanalmente -->
+  <ion-item>
+    <ion-label>Repetir semanalmente</ion-label>
+    <ion-checkbox slot="start" [(ngModel)]="editedReminder.weekly"></ion-checkbox>
+  </ion-item>
+
+  <!-- Botón para actualizar -->
+  <ion-button expand="block" (click)="save()">Actualizar</ion-button>
+</ion-content>
