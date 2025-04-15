@@ -39,6 +39,7 @@ export class ReminderComponent implements OnInit {
   }
 
   async openNewReminderModal() {
+    console.log("abierto");
     const modal = await this.modalController.create({
       component: NewReminderModalComponent
     });

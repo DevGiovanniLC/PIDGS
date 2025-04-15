@@ -1,39 +1,70 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Editar Reminder</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cancel()">
-        <ion-icon name="close-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="min-h-screen bg-gray-50 font-sans">
+  <!-- Encabezado -->
+  <header class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md flex justify-between items-center">
+    <h1 class="text-2xl font-semibold text-white">Editar Reminder</h1>
+    <button (click)="cancel()" class="p-2 rounded-full hover:bg-blue-100">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Ícono close -->
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </header>
 
-<ion-content class="ion-padding">
-  <!-- Título -->
-  <ion-item>
-    <ion-label position="stacked">Título</ion-label>
-    <ion-input [(ngModel)]="editedReminder.title" placeholder="Título"></ion-input>
-  </ion-item>
+  <!-- Contenido -->
+  <main class="p-6 space-y-6">
+    <!-- Título -->
+    <div>
+      <label for="title" class="block text-gray-700 text-sm font-medium mb-2">Título</label>
+      <input
+        id="title"
+        type="text"
+        [(ngModel)]="editedReminder.title"
+        placeholder="Título"
+        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
 
-  <!-- Descripción -->
-  <ion-item>
-    <ion-label position="stacked">Descripción</ion-label>
-    <ion-textarea [(ngModel)]="editedReminder.description" placeholder="Descripción"></ion-textarea>
-  </ion-item>
+    <!-- Descripción -->
+    <div>
+      <label for="description" class="block text-gray-700 text-sm font-medium mb-2">Descripción</label>
+      <textarea
+        id="description"
+        [(ngModel)]="editedReminder.description"
+        placeholder="Descripción"
+        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      ></textarea>
+    </div>
 
-  <!-- Fecha y Hora -->
-  <ion-item>
-    <ion-label position="stacked">Fecha y Hora</ion-label>
-    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" [(ngModel)]="editedReminder.date"></ion-datetime>
-  </ion-item>
+    <!-- Fecha y Hora -->
+    <div>
+      <label for="datetime" class="block text-gray-700 text-sm font-medium mb-2">Fecha y Hora</label>
+      <input
+        id="datetime"
+        type="datetime-local"
+        [(ngModel)]="editedReminder.date"
+        class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
 
-  <!-- Checkbox para repetir semanalmente -->
-  <ion-item>
-    <ion-label>Repetir semanalmente</ion-label>
-    <ion-checkbox slot="start" [(ngModel)]="editedReminder.weekly"></ion-checkbox>
-  </ion-item>
+    <!-- Checkbox para repetir semanalmente -->
+    <div class="flex items-center">
+      <input
+        id="weekly"
+        type="checkbox"
+        [(ngModel)]="editedReminder.weekly"
+        class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+      />
+      <label for="weekly" class="ml-2 text-gray-700 text-sm">
+        Repetir semanalmente
+      </label>
+    </div>
 
-  <!-- Botón para actualizar -->
-  <ion-button expand="block" (click)="save()">Actualizar</ion-button>
-</ion-content>
+    <!-- Botón para actualizar -->
+    <button
+      (click)="save()"
+      class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow"
+    >
+      Actualizar
+    </button>
+  </main>
+</div>

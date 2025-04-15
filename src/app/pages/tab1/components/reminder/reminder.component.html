@@ -1,28 +1,26 @@
 <div class="bg-gray-50 min-h-screen relative font-sans">
-  
   <!-- Encabezado con gradiente -->
-  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
+  <header class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
     <h1 class="text-2xl font-semibold text-white text-center">
-      Mis Reminders
+      Reminders
     </h1>
-  </div>
-  
+  </header>
+
   <!-- Contenedor principal centrado -->
-  <div class="max-w-3xl mx-auto p-6">
-    
+  <main class="max-w-3xl mx-auto p-6">
     <!-- Botón para agregar un nuevo reminder -->
     <div class="flex justify-end mb-6">
-      <ion-button color="primary" (click)="openNewReminderModal()">
+      <button (click)="openNewReminderModal()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow">
         Nuevo Reminder
-      </ion-button>
+      </button>
     </div>
-    
+
     <!-- Lista de reminders -->
     <div 
       *ngFor="let reminder of reminders()" 
-      class="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-sm transition-all"
-      (click)="openEditReminderModal(reminder)"
-    >
+      class="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-sm transition-all cursor-pointer"
+      (click)="openEditReminderModal(reminder)">
+      
       <div>
         <h2 class="text-lg font-semibold text-gray-800">{{ reminder.title }}</h2>
         <p class="text-gray-700">{{ reminder.description }}</p>
@@ -33,15 +31,24 @@
           </span>
         </p>
       </div>
+      
+      <!-- Botones de acciones -->
       <div class="flex items-center space-x-2" (click)="$event.stopPropagation()">
-        <ion-button color="warning" (click)="openEditReminderModal(reminder)">
-          <ion-icon name="pencil-outline"></ion-icon>
-        </ion-button>
-        <ion-button color="danger" (click)="deleteReminder(reminder)">
-          <ion-icon name="trash-outline"></ion-icon>
-        </ion-button>
+        <!-- Botón de edición: ícono violeta -->
+        <button (click)="openEditReminderModal(reminder)" class="p-2 rounded-full hover:bg-violet-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Ícono de lápiz (edición) con estilo más moderno -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 3.5a2.121 2.121 0 013 3L10.5 19.5H7v-3.5L16.5 3.5z" />
+          </svg>
+        </button>
+        <!-- Botón de eliminación: ícono rojo -->
+        <button (click)="deleteReminder(reminder)" class="p-2 rounded-full hover:bg-red-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Ícono de papelera -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v1H9V4a1 1 0 011-1z" />
+          </svg>
+        </button>
       </div>
     </div>
-    
-  </div>
+  </main>
 </div>
