@@ -1,91 +1,140 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-// Importación de los modales de agregar y editar
-import { NewReminderModalComponent } from '../creating-new-reminder/creating-new-reminder.component';
-import { EditReminderModalComponent } from '../editing-reminder-modal/editing-reminder-modal.component';
-
-import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
-import { NotificationService } from 'src/app/services/Notification.service';
-import { Reminder } from 'src/app/models/Reminder';
-import { Notification } from 'src/app/models/Notification';
+export interface Reminder {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  periodicity: 'weekly' | 'none';
+  weekly: boolean;
+}
 
 @Component({
-  selector: 'app-reminder',
-  standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  templateUrl: './reminder.component.html',
-  styleUrls: ['./reminder.component.scss']
+  selector: 'app-reminder-monolitico',
+  templateUrl: 'reminder.component.html',
+  styleUrls: ['reminder.component.scss'],
+  imports: [FormsModule, CommonModule]
 })
 export class ReminderComponent implements OnInit {
-  reminders = signal<Reminder[]>([]);
+  reminders: Reminder[] = [];
+  swipedReminderId: number | null = null;
+  startX = 0;
+  showNewReminderModal: boolean = false;
+  showEditReminderModal: boolean = false;
 
-  constructor(
-    private modalController: ModalController,
-    private reminderManager: ReminderManagerService,
-    private notificationService: NotificationService
-  ) { }
+  // Modelo para nuevo reminder
+  newReminder: Reminder = {
+    id: 0,
+    title: '',
+    description: '',
+    date: '',
+    periodicity: 'none',
+    weekly: false
+  };
+
+  // Modelo para edición
+  editedReminder: Reminder = {
+    id: 0,
+    title: '',
+    description: '',
+    date: '',
+    periodicity: 'none',
+    weekly: false
+  };
 
   ngOnInit(): void {
-    this.loadReminders();
-    // Solicita permisos para notificaciones si es necesario
-    this.notificationService.requestPermissions();
+    this.reminders = [
+      {
+        id: 1,
+        title: 'Comprar alimentos',
+        description: 'Frutas, verduras y pan',
+        date: new Date().toISOString(),
+        periodicity: 'none',
+        weekly: false
+      },
+      {
+        id: 2,
+        title: 'Reunión de trabajo',
+        description: 'Planificar proyecto',
+        date: new Date().toISOString(),
+        periodicity: 'weekly',
+        weekly: true
+      }
+    ];
   }
 
-  private async loadReminders() {
-    this.reminders.set(await this.reminderManager.getReminders());
+  // Funciones para el modal de nuevo reminder
+  openNewReminderModal(): void {
+    this.newReminder = { id: 0, title: '', description: '', date: '', periodicity: 'none', weekly: false };
+    this.showNewReminderModal = true;
   }
 
-  async openNewReminderModal() {
-    console.log("abierto");
-    const modal = await this.modalController.create({
-      component: NewReminderModalComponent
-    });
-    await modal.present();
+  closeNewReminderModal(): void {
+    this.showNewReminderModal = false;
+  }
 
-    const { data, role } = await modal.onDidDismiss();
-    if (role === 'confirm' && data) {
-      const newReminder: Reminder = {
-        id: this.reminders().length + 1,
-        ...data,
-        periodicity: data.periodicity || 'none'
-      };
+  addReminder(): void {
+    if (!this.newReminder.title || !this.newReminder.date) {
+      return;
+    }
+    const newId = this.reminders.length > 0 ? Math.max(...this.reminders.map(r => r.id)) + 1 : 1;
+    const reminderToAdd: Reminder = { ...this.newReminder, id: newId };
+    reminderToAdd.periodicity = reminderToAdd.weekly ? 'weekly' : 'none';
+    this.reminders.push(reminderToAdd);
+    this.closeNewReminderModal();
+  }
 
-      // Agrega el nuevo reminder y actualiza el listado
-      this.reminderManager.addReminder(newReminder);
-      this.reminders.update(reminders => [...reminders, newReminder]);
+  // Funciones para el modal de edición
+  openEditReminder(reminder: Reminder): void {
+    // Evita abrir el modal si se encuentra en estado de swipe
+    if (this.swipedReminderId === reminder.id) {
+      return;
+    }
+    this.editedReminder = { ...reminder };
+    this.showEditReminderModal = true;
+  }
 
-      // Opcional: Programar notificación
-      const notification: Notification = {
-        title: newReminder.title,
-        body: newReminder.description,
-        scheduleTime: new Date(newReminder.date).toISOString()
-      };
-      await this.notificationService.scheduleNotification(notification);
+  closeEditReminderModal(): void {
+    this.showEditReminderModal = false;
+  }
+
+  updateReminder(): void {
+    if (!this.editedReminder.title || !this.editedReminder.date) {
+      return;
+    }
+    this.editedReminder.periodicity = this.editedReminder.weekly ? 'weekly' : 'none';
+    const index = this.reminders.findIndex(r => r.id === this.editedReminder.id);
+    if (index !== -1) {
+      this.reminders[index] = { ...this.editedReminder };
+    }
+    this.closeEditReminderModal();
+  }
+
+  deleteReminder(reminder: Reminder): void {
+    this.reminders = this.reminders.filter(r => r.id !== reminder.id);
+    this.swipedReminderId = null;
+  }
+
+  // Handlers para detectar el swipe (movimiento táctil)
+  startSwipe(event: TouchEvent, reminderId: number): void {
+    this.startX = event.touches[0].clientX;
+  }
+
+  moveSwipe(event: TouchEvent, reminderId: number): void {
+    const currentX = event.touches[0].clientX;
+    const deltaX = this.startX - currentX;
+    if (deltaX > 50) {
+      this.swipedReminderId = reminderId;
     }
   }
 
-  async openEditReminderModal(reminder: Reminder) {
-    const modal = await this.modalController.create({
-      component: EditReminderModalComponent,
-      componentProps: { reminder }
-    });
-    await modal.present();
-
-    const { data, role } = await modal.onDidDismiss();
-    if (role === 'confirm' && data) {
-      const updatedReminder = data as Reminder;
-      this.reminders.update(reminders =>
-        reminders.map(r => r.id === reminder.id ? updatedReminder : r)
-      );
-      this.reminderManager.updateReminder(updatedReminder);
+  endSwipe(event: TouchEvent, reminderId: number): void {
+    const endX = event.changedTouches[0].clientX;
+    const deltaX = this.startX - endX;
+    if (deltaX < 30) {
+      this.swipedReminderId = null;
     }
-  }
-
-  deleteReminder(reminder: Reminder) {
-    this.reminders.update(reminders => reminders.filter(r => r.id !== reminder.id));
-    this.reminderManager.deleteReminder(reminder);
   }
 }
