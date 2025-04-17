@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
 import { Reminder } from 'src/app/models/Reminder';
+import { NotificationService } from 'src/app/services/Notification.service';
+import { Notification } from 'src/app/models/Notification';
 
 @Component({
   selector: 'app-reminder-monolitico',
@@ -14,35 +16,79 @@ export class ReminderComponent implements OnInit {
   reminders: Reminder[] = [];
   swipedReminderId: number | null = null;
   startX = 0;
-  showNewReminderModal: boolean = false;
-  showEditReminderModal: boolean = false;
+  showNewReminderModal = false;
+  showEditReminderModal = false;
 
   newReminder!: Reminder;
   editedReminder!: Reminder;
+  permissionsGranted = false;
 
+  constructor(
+    private readonly reminderManager: ReminderManagerService,
+    private readonly notificationService: NotificationService
+  ) {}
 
-  constructor(private readonly reminderManager: ReminderManagerService) { }
-
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.requestNotificationPermission();
     this.updateReminderList();
   }
 
-  // CRUD functions
-  // add, update, delete
-  addReminder(): void {
+  private async requestNotificationPermission(): Promise<void> {
+    const result = await this.notificationService.requestPermissions();
+    this.permissionsGranted = result === 1;
+  }
+
+  async addReminder(): Promise<void> {
     if (!this.newReminder.title || !this.newReminder.date) return;
 
-    this.reminderManager.addReminder(this.newReminder)
+    const currentTime = new Date();
+    const reminderTime = new Date(this.newReminder.date);
+
+    if (reminderTime.getTime() <= currentTime.getTime()) {
+      alert('La fecha y hora de la notificación deben ser posteriores al momento actual.');
+      return;
+    }
+
+    await this.reminderManager.addReminder(this.newReminder);
+
+    if (this.permissionsGranted) {
+      const notification: Notification = {
+        id: this.newReminder.id,
+        title: this.newReminder.title,
+        body: this.newReminder.description || '',
+        scheduleTime: this.newReminder.date
+      };
+      await this.notificationService.scheduleNotification(notification);
+    }
+
     this.updateReminderList();
     this.closeNewReminderModal();
   }
 
-  updateReminder(): void {
+  async updateReminder(): Promise<void> {
     if (!this.editedReminder.title || !this.editedReminder.date) return;
+
+    const currentTime = new Date();
+    const reminderTime = new Date(this.editedReminder.date);
+
+    if (reminderTime.getTime() <= currentTime.getTime()) {
+      alert('La fecha y hora de la notificación deben ser posteriores al momento actual.');
+      return;
+    }
 
     this.editedReminder.periodicity = this.editedReminder.weekly ? 'weekly' : 'none';
 
-    this.reminderManager.updateReminder(this.editedReminder);
+    await this.reminderManager.updateReminder(this.editedReminder);
+    if (this.permissionsGranted) {
+      const notification: Notification = {
+        id: this.editedReminder.id,
+        title: this.editedReminder.title,
+        body: this.editedReminder.description || '',
+        scheduleTime: this.editedReminder.date
+      };
+      await this.notificationService.scheduleNotification(notification);
+    }
+
     this.updateReminderList();
     this.closeEditReminderModal();
   }
@@ -53,9 +99,17 @@ export class ReminderComponent implements OnInit {
     this.swipedReminderId = null;
   }
 
-  // add remider modal functions
   openNewReminderModal(): void {
-    this.newReminder = { id: this.reminders.length + 1, title: '', description: '', date: new Date().toISOString().slice(0, 16), periodicity: 'none', weekly: false };
+    const now = new Date();
+    const tzOffsetMs = now.getTimezoneOffset() * 60000;
+    this.newReminder = {
+      id: this.reminders.length + 1,
+      title: '',
+      description: '',
+      date: new Date(now.getTime() - tzOffsetMs).toISOString().slice(0, 16),
+      periodicity: 'none',
+      weekly: false
+    };
     this.showNewReminderModal = true;
   }
 
@@ -63,11 +117,14 @@ export class ReminderComponent implements OnInit {
     this.showNewReminderModal = false;
   }
 
-  // edit reminder modal functions
   openEditReminder(reminder: Reminder): void {
     if (this.swipedReminderId === reminder.id) return;
-
-    this.editedReminder = { ...reminder };
+    const d = new Date(reminder.date);
+    const tzOffsetMs = d.getTimezoneOffset() * 60000;
+    this.editedReminder = {
+      ...reminder,
+      date: new Date(d.getTime() - tzOffsetMs).toISOString().slice(0, 16)
+    };
     this.showEditReminderModal = true;
   }
 
@@ -75,7 +132,6 @@ export class ReminderComponent implements OnInit {
     this.showEditReminderModal = false;
   }
 
-  // Handlers for swipe events
   startSwipe(event: TouchEvent): void {
     this.startX = event.touches[0].clientX;
   }
@@ -96,11 +152,9 @@ export class ReminderComponent implements OnInit {
     }
   }
 
-  // Function to update the list of reminders
   private updateReminderList(): void {
     this.reminderManager.getReminders().then((reminders: Reminder[]) => {
       this.reminders = reminders;
-    })
+    });
   }
-
 }
