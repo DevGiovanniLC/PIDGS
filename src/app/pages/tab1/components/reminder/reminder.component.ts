@@ -21,18 +21,40 @@ export class ReminderComponent implements OnInit {
   editedReminder!: Reminder;
 
 
-
-  constructor(private readonly reminderManager: ReminderManagerService) {
-
-  }
+  constructor(private readonly reminderManager: ReminderManagerService) { }
 
   ngOnInit(): void {
     this.updateReminderList();
   }
 
+  // CRUD de recordatorios
+  addReminder(): void {
+    if (!this.newReminder.title || !this.newReminder.date) return;
+
+    this.reminderManager.addReminder(this.newReminder)
+    this.updateReminderList();
+    this.closeNewReminderModal();
+  }
+
+  updateReminder(): void {
+    if (!this.editedReminder.title || !this.editedReminder.date) return;
+
+    this.editedReminder.periodicity = this.editedReminder.weekly ? 'weekly' : 'none';
+
+    this.reminderManager.updateReminder(this.editedReminder);
+    this.updateReminderList();
+    this.closeEditReminderModal();
+  }
+
+  deleteReminder(reminder: Reminder): void {
+    this.reminderManager.deleteReminder(reminder);
+    this.updateReminderList();
+    this.swipedReminderId = null;
+  }
+
   // Funciones para el modal de nuevo reminder
   openNewReminderModal(): void {
-    this.newReminder = { id: this.reminders.length+1, title: '', description: '', date: new Date().toISOString().slice(0, 16), periodicity: 'none', weekly: false };
+    this.newReminder = { id: this.reminders.length + 1, title: '', description: '', date: new Date().toISOString().slice(0, 16), periodicity: 'none', weekly: false };
     this.showNewReminderModal = true;
   }
 
@@ -40,20 +62,11 @@ export class ReminderComponent implements OnInit {
     this.showNewReminderModal = false;
   }
 
-  addReminder(): void {
-    if (!this.newReminder.title || !this.newReminder.date) {
-      return;
-    }
-    this.reminderManager.addReminder(this.newReminder)
-    this.updateReminderList();
-    this.closeNewReminderModal();
-  }
   // Funciones para el modal de edición
   openEditReminder(reminder: Reminder): void {
     // Evita abrir el modal si se encuentra en estado de swipe
-    if (this.swipedReminderId === reminder.id) {
-      return;
-    }
+    if (this.swipedReminderId === reminder.id) return;
+
     this.editedReminder = { ...reminder };
     this.showEditReminderModal = true;
   }
@@ -62,32 +75,8 @@ export class ReminderComponent implements OnInit {
     this.showEditReminderModal = false;
   }
 
-  updateReminder(): void {
-    if (!this.editedReminder.title || !this.editedReminder.date) {
-      return;
-    }
-    this.editedReminder.periodicity = this.editedReminder.weekly ? 'weekly' : 'none';
-    const index = this.reminders.findIndex(r => r.id === this.editedReminder.id);
-    if (index !== -1) {
-      this.reminders[index] = { ...this.editedReminder };
-    }
-    this.closeEditReminderModal();
-  }
-
-  deleteReminder(reminder: Reminder): void {
-    this.reminders = this.reminders.filter(r => r.id !== reminder.id);
-    this.reminderManager.deleteReminder(reminder);
-    this.swipedReminderId = null;
-  }
-
-  private updateReminderList(): void {
-    this.reminderManager.getReminders().then((reminders: Reminder[]) => {
-      this.reminders = reminders;
-    })
-  }
-
   // Handlers para detectar el swipe (movimiento táctil)
-  startSwipe(event: TouchEvent, reminderId: number): void {
+  startSwipe(event: TouchEvent): void {
     this.startX = event.touches[0].clientX;
   }
 
@@ -99,11 +88,19 @@ export class ReminderComponent implements OnInit {
     }
   }
 
-  endSwipe(event: TouchEvent, reminderId: number): void {
+  endSwipe(event: TouchEvent): void {
     const endX = event.changedTouches[0].clientX;
     const deltaX = this.startX - endX;
     if (deltaX < 30) {
       this.swipedReminderId = null;
     }
   }
+
+  // Función para actualizar la lista de recordatorios para sincronizar datos
+  private updateReminderList(): void {
+    this.reminderManager.getReminders().then((reminders: Reminder[]) => {
+      this.reminders = reminders;
+    })
+  }
+
 }
