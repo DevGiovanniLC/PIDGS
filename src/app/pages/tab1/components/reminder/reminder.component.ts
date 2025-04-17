@@ -27,7 +27,8 @@ export class ReminderComponent implements OnInit {
     this.updateReminderList();
   }
 
-  // CRUD de recordatorios
+  // CRUD functions
+  // add, update, delete
   addReminder(): void {
     if (!this.newReminder.title || !this.newReminder.date) return;
 
@@ -52,7 +53,7 @@ export class ReminderComponent implements OnInit {
     this.swipedReminderId = null;
   }
 
-  // Funciones para el modal de nuevo reminder
+  // add remider modal functions
   openNewReminderModal(): void {
     this.newReminder = { id: this.reminders.length + 1, title: '', description: '', date: new Date().toISOString().slice(0, 16), periodicity: 'none', weekly: false };
     this.showNewReminderModal = true;
@@ -62,9 +63,8 @@ export class ReminderComponent implements OnInit {
     this.showNewReminderModal = false;
   }
 
-  // Funciones para el modal de edición
+  // edit reminder modal functions
   openEditReminder(reminder: Reminder): void {
-    // Evita abrir el modal si se encuentra en estado de swipe
     if (this.swipedReminderId === reminder.id) return;
 
     this.editedReminder = { ...reminder };
@@ -75,7 +75,7 @@ export class ReminderComponent implements OnInit {
     this.showEditReminderModal = false;
   }
 
-  // Handlers para detectar el swipe (movimiento táctil)
+  // Handlers for swipe events
   startSwipe(event: TouchEvent): void {
     this.startX = event.touches[0].clientX;
   }
@@ -96,7 +96,7 @@ export class ReminderComponent implements OnInit {
     }
   }
 
-  // Función para actualizar la lista de recordatorios para sincronizar datos
+  // Function to update the list of reminders
   private updateReminderList(): void {
     this.reminderManager.getReminders().then((reminders: Reminder[]) => {
       this.reminders = reminders;

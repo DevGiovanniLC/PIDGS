@@ -1,138 +1,141 @@
-<div class="bg-gray-50 min-h-screen relative font-sans">
-  <!-- Encabezado -->
-  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
-    <h1 class="text-2xl font-semibold text-white text-center">Reminders</h1>
-  </div>
+<header class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
+  <h1 class="text-2xl font-semibold text-white text-center">Reminders</h1>
+</header>
 
-  <!-- Lista de reminders -->
-  <div class="p-4 space-y-4">
-    <div *ngFor="let reminder of reminders" class="relative">
-      <!-- Fondo para el botón de borrado (swipe) -->
-      <div class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none text-zinc-900">
+<main class="bg-gray-50 min-h-screen font-sans p-4 space-y-4">
+  <ul class="space-y-4">
+    <li *ngFor="let reminder of reminders" class="relative">
+
+      <!-- Swipe background for delete -->
+      <div
+        class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none text-zinc-900">
         <button (click)="deleteReminder(reminder)"
-                class="pointer-events-auto flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow focus:outline-none transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
+          class="pointer-events-auto flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow focus:outline-none transition"
+          aria-label="Delete reminder">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v1H9V4a1 1 0 011-1z" />
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4a1 1 0 011 1v1H9V4a1 1 0 011-1z" />
           </svg>
-          <span>Borrar</span>
+          <span>Delete</span>
         </button>
       </div>
 
-      <!-- Contenido deslizable: swipe para borrar y click para editar -->
-      <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-transform duration-300 ease-in-out cursor-pointer relative z-20"
-           [ngClass]="{ '-translate-x-36': swipedReminderId === reminder.id, 'translate-x-0': swipedReminderId !== reminder.id }"
-           (click)="openEditReminder(reminder)"
-           (touchstart)="startSwipe($event)"
-           (touchmove)="moveSwipe($event, reminder.id)"
-           (touchend)="endSwipe($event)">
+      <!-- Reminder card (swipe & click) -->
+      <article
+        class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-transform duration-300 ease-in-out cursor-pointer relative z-20"
+        [ngClass]="{
+          '-translate-x-36': swipedReminderId === reminder.id,
+          'translate-x-0':    swipedReminderId !== reminder.id
+        }" (click)="openEditReminder(reminder)" (touchstart)="startSwipe($event)"
+        (touchmove)="moveSwipe($event, reminder.id)" (touchend)="endSwipe($event)">
         <div>
           <h2 class="text-lg font-semibold text-gray-800">{{ reminder.title }}</h2>
           <p class="text-gray-700">{{ reminder.description }}</p>
-          <p class="text-gray-500 text-sm">
+          <time class="text-gray-500 text-sm">
             {{ reminder.date | date:'short' }}
-            <span *ngIf="reminder.periodicity === 'weekly'"> - Repeats weekly</span>
-          </p>
+            <span *ngIf="reminder.periodicity === 'weekly'"> – Repeats weekly</span>
+          </time>
         </div>
-      </div>
-    </div>
-  </div>
+      </article>
+    </li>
+  </ul>
+</main>
 
-  <!-- Botón flotante para agregar nuevo reminder -->
-  <div class="fixed bottom-6 right-6">
-    <button (click)="openNewReminderModal()"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition transform hover:scale-105 focus:outline-none">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clip-rule="evenodd" />
+<aside class="fixed bottom-6 right-6">
+  <button (click)="openNewReminderModal()"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition transform hover:scale-105 focus:outline-none"
+    aria-label="Add new reminder">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd"
+        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+    </svg>
+  </button>
+</aside>
+
+<!-- Modal: New Reminder -->
+<section *ngIf="showNewReminderModal" role="dialog" aria-labelledby="new-reminder-title"
+  class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 text-zinc-900">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
+    <button (click)="closeNewReminderModal()"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+      aria-label="Close new reminder modal">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
-  </div>
-
-  <!-- Modal: Nuevo Reminder -->
-  <div *ngIf="showNewReminderModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300 text-zinc-900">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
-      <button (click)="closeNewReminderModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">New Reminder</h2>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Title</label>
-          <input type="text" [(ngModel)]="newReminder.title" placeholder="Title"
-                 class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Description</label>
-          <textarea [(ngModel)]="newReminder.description" placeholder="Description"
-                    class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        </div>
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Date and time</label>
-          <input type="datetime-local" [(ngModel)]="newReminder.date" [value]="newReminder.date | date:'yyyy-MM-ddTHH:mm'"
-                 class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div class="flex items-center">
-          <input id="new-weekly" type="checkbox" [(ngModel)]="newReminder.weekly"
-                 class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-          <label for="new-weekly" class="ml-2 text-gray-700 text-sm">Repeats weekly</label>
-        </div>
-        <button (click)="addReminder()"
-                class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 rounded transition flex items-center justify-center font-light focus:outline-none">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clip-rule="evenodd" />
-          </svg>
-          Add reminder
-        </button>
+    <h2 id="new-reminder-title" class="text-xl font-semibold mb-4 text-center text-gray-800">New Reminder</h2>
+    <form class="space-y-4" (ngSubmit)="addReminder()">
+      <div>
+        <label for="title" class="block text-gray-700 text-sm font-medium mb-2">Title</label>
+        <input id="title" type="text" [(ngModel)]="newReminder.title" name="title" placeholder="Title"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
       </div>
-    </div>
-  </div>
-
-  <!-- Modal: Editar Reminder -->
-  <div *ngIf="showEditReminderModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300 text-zinc-900">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
-      <button (click)="closeEditReminderModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h2 class="text-xl font-semibold mb-4 text-center text-gray-800">Edit reminder</h2>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Title</label>
-          <input type="text" [(ngModel)]="editedReminder.title" placeholder="Title"
-                 class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Description</label>
-          <textarea [(ngModel)]="editedReminder.description" placeholder="Description"
-                    class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        </div>
-        <div>
-          <label class="block text-gray-700 text-sm font-medium mb-2">Date and time</label>
-          <input type="datetime-local" [(ngModel)]="editedReminder.date"
-                 class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div class="flex items-center">
-          <input id="edit-weekly" type="checkbox" [(ngModel)]="editedReminder.weekly"
-                 class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-          <label for="edit-weekly" class="ml-2 text-gray-700 text-sm">Repeats weekly</label>
-        </div>
-        <button (click)="updateReminder()"
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow">
-          Update
-        </button>
+      <div>
+        <label for="description" class="block text-gray-700 text-sm font-medium mb-2">Description</label>
+        <textarea id="description" [(ngModel)]="newReminder.description" name="description" placeholder="Description"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
       </div>
-    </div>
+      <div>
+        <label for="datetime" class="block text-gray-700 text-sm font-medium mb-2">Date and time</label>
+        <input id="datetime" type="datetime-local" [(ngModel)]="newReminder.date" name="date"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+      </div>
+      <div class="flex items-center">
+        <input id="weekly" type="checkbox" [(ngModel)]="newReminder.weekly" name="weekly"
+          class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
+        <label for="weekly" class="ml-2 text-gray-700 text-sm">Repeats weekly</label>
+      </div>
+      <button type="submit"
+        class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2 rounded transition flex items-center justify-center font-light focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+            clip-rule="evenodd" />
+        </svg>
+        Add
+      </button>
+    </form>
   </div>
-</div>
+</section>
+
+<!-- Modal: Edit Reminder -->
+<section *ngIf="showEditReminderModal" role="dialog" aria-labelledby="edit-reminder-title"
+  class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 text-zinc-900">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
+    <button (click)="closeEditReminderModal()"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+      aria-label="Close edit reminder modal">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h2 id="edit-reminder-title" class="text-xl font-semibold mb-4 text-center text-gray-800">Edit Reminder</h2>
+    <form class="space-y-4" (ngSubmit)="updateReminder()">
+      <div>
+        <label for="edit-title" class="block text-gray-700 text-sm font-medium mb-2">Title</label>
+        <input id="edit-title" type="text" [(ngModel)]="editedReminder.title" name="title" placeholder="Title"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+      </div>
+      <div>
+        <label for="edit-description" class="block text-gray-700 text-sm font-medium mb-2">Description</label>
+        <textarea id="edit-description" [(ngModel)]="editedReminder.description" name="description"
+          placeholder="Description"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+      <div>
+        <label for="edit-datetime" class="block text-gray-700 text-sm font-medium mb-2">Date and time</label>
+        <input id="edit-datetime" type="datetime-local" [(ngModel)]="editedReminder.date" name="date"
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+      </div>
+      <div class="flex items-center">
+        <input id="edit-weekly" type="checkbox" [(ngModel)]="editedReminder.weekly" name="weekly"
+          class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
+        <label for="edit-weekly" class="ml-2 text-gray-700 text-sm">Repeats weekly</label>
+      </div>
+      <button type="submit"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow focus:outline-none">
+        Update
+      </button>
+    </form>
+  </div>
+</section>
