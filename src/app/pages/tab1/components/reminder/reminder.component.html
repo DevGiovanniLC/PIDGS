@@ -1,14 +1,14 @@
-<header class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
-  <h1 class="text-2xl font-semibold text-white text-center">Reminders</h1>
+<header class="bg-gradient-to-r from-blue-500 to-purple-500 p-2 shadow-md">
+  <h1 class="text-2xl font-bold text-white text-center">Reminders</h1>
 </header>
 
 <main class="bg-gray-50 min-h-screen font-sans p-4 space-y-4">
-  <ul class="space-y-4">
-    <li *ngFor="let reminder of reminders" class="relative">
+  <ul class="space-y-4 overflow-y-auto max-h-[calc(100vh-160px)] z-0">
+    <li *ngFor="let reminder of reminders" class="relative z-0">
 
       <!-- Swipe background for delete -->
       <div
-        class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none text-zinc-900">
+        class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 pointer-events-none text-zinc-900">
         <button (click)="deleteReminder(reminder)"
           class="pointer-events-auto flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow focus:outline-none transition"
           aria-label="Delete reminder">

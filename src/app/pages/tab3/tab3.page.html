@@ -1,7 +1,7 @@
 <div class="bg-gray-50 min-h-screen relative font-sans">
   <!-- Header -->
-  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-4 shadow-md">
-    <h1 class="text-2xl font-semibold text-white text-center">To-Do</h1>
+  <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-2 shadow-md">
+    <h1 class="text-2xl font-bold text-white text-center">To-Do</h1>
   </div>
 
   <!-- Lista de tareas agrupadas -->
@@ -70,7 +70,7 @@
 
   <!-- Modal: Nuevo To-Do -->
   <div *ngIf="showTodoModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">  
+    <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
       <button (click)="closeTodoModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
