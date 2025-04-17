@@ -8,7 +8,7 @@
   <div class="p-4 space-y-4">
     <div *ngFor="let reminder of reminders" class="relative">
       <!-- Fondo para el botón de borrado (swipe) -->
-      <div class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none">
+      <div class="absolute inset-0 flex items-center justify-end px-4 bg-red-100 z-10 pointer-events-none text-zinc-900">
         <button (click)="deleteReminder(reminder)"
                 class="pointer-events-auto flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow focus:outline-none transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
@@ -52,7 +52,7 @@
   </div>
 
   <!-- Modal: Nuevo Reminder -->
-  <div *ngIf="showNewReminderModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300">
+  <div *ngIf="showNewReminderModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300 text-zinc-900">
     <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md relative">
       <button (click)="closeNewReminderModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
