@@ -59,4 +59,12 @@ export class TodoService {
     this.setStoredTodos(todos);
     return of(void 0);
   }
+  
+  updateTodo(updatedTodo: Todo): Observable<Todo> {
+    const todos = this.getStoredTodos().map(todo =>
+      todo.id === updatedTodo.id ? { ...updatedTodo } : todo
+    );
+    this.setStoredTodos(todos);
+    return of(updatedTodo);
+  }
 }

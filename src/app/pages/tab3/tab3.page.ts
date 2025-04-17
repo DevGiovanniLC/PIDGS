@@ -23,6 +23,8 @@ export class Tab3Page implements OnInit {
   expandedCategories: { [category: string]: boolean } = {};
 
   showTodoModal = false;
+  editMode = false;
+  todoBeingEdited: Todo | null = null;
   showCategoryModal = false;
   isAddingInline = false;
 
@@ -58,14 +60,30 @@ export class Tab3Page implements OnInit {
     const text = this.newTodoText.trim();
     const category = this.newTodoCategory.trim();
     if (!text || !category) return;
-
-    this.todoService.addTodo(text, category).subscribe(newTodo => {
-      this.todos.push(newTodo);
-      this.newTodoText = '';
-      this.newTodoCategory = '';
-      this.groupTodosByCategory();
-      this.closeTodoModal();
-    });
+    if (this.editMode && this.todoBeingEdited) {
+      const updatedTodo = {
+        ...this.todoBeingEdited,
+        text,
+        category
+      };
+  
+      this.todoService.updateTodo(updatedTodo).subscribe(() => {
+        const index = this.todos.findIndex(t => t.id === updatedTodo.id);
+        if (index !== -1) {
+          this.todos[index] = updatedTodo;
+          this.groupTodosByCategory();
+        }
+        this.resetModalState();
+      });
+    } else {
+        this.todoService.addTodo(text, category).subscribe(newTodo => {
+        this.todos.push(newTodo);
+        this.newTodoText = '';
+        this.newTodoCategory = '';
+        this.groupTodosByCategory();
+        this.closeTodoModal();
+      });
+  }
   }
 
   toggleTodo(todo: Todo) {
@@ -92,9 +110,26 @@ export class Tab3Page implements OnInit {
   }
 
   closeTodoModal() {
+    this.resetModalState();
+  }
+
+  private resetModalState() {
+    this.newTodoText = '';
+    this.newTodoCategory = '';
+    this.editMode = false;
+    this.todoBeingEdited = null;
     this.showTodoModal = false;
   }
 
+  openEditModal(todo: Todo) {
+    this.editMode = true;
+    this.todoBeingEdited = { ...todo };
+  
+    this.newTodoText = todo.text;
+    this.newTodoCategory = todo.category!;
+  
+    this.showTodoModal = true;
+  }
   openCategoryModal() {
     this.showCategoryModal = true;
   }
