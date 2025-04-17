@@ -1,15 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-export interface Reminder {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  periodicity: 'weekly' | 'none';
-  weekly: boolean;
-}
+import { ReminderManagerService } from 'src/app/services/ReminderManager.service';
+import { Reminder } from 'src/app/models/Reminder';
 
 @Component({
   selector: 'app-reminder-monolitico',
@@ -24,50 +17,22 @@ export class ReminderComponent implements OnInit {
   showNewReminderModal: boolean = false;
   showEditReminderModal: boolean = false;
 
-  // Modelo para nuevo reminder
-  newReminder: Reminder = {
-    id: 0,
-    title: '',
-    description: '',
-    date: '',
-    periodicity: 'none',
-    weekly: false
-  };
+  newReminder!: Reminder;
+  editedReminder!: Reminder;
 
-  // Modelo para edición
-  editedReminder: Reminder = {
-    id: 0,
-    title: '',
-    description: '',
-    date: '',
-    periodicity: 'none',
-    weekly: false
-  };
+
+
+  constructor(private readonly reminderManager: ReminderManagerService) {
+
+  }
 
   ngOnInit(): void {
-    this.reminders = [
-      {
-        id: 1,
-        title: 'Comprar alimentos',
-        description: 'Frutas, verduras y pan',
-        date: new Date().toISOString(),
-        periodicity: 'none',
-        weekly: false
-      },
-      {
-        id: 2,
-        title: 'Reunión de trabajo',
-        description: 'Planificar proyecto',
-        date: new Date().toISOString(),
-        periodicity: 'weekly',
-        weekly: true
-      }
-    ];
+    this.updateReminderList();
   }
 
   // Funciones para el modal de nuevo reminder
   openNewReminderModal(): void {
-    this.newReminder = { id: 0, title: '', description: '', date: '', periodicity: 'none', weekly: false };
+    this.newReminder = { id: this.reminders.length+1, title: '', description: '', date: new Date().toISOString().slice(0, 16), periodicity: 'none', weekly: false };
     this.showNewReminderModal = true;
   }
 
@@ -79,13 +44,10 @@ export class ReminderComponent implements OnInit {
     if (!this.newReminder.title || !this.newReminder.date) {
       return;
     }
-    const newId = this.reminders.length > 0 ? Math.max(...this.reminders.map(r => r.id)) + 1 : 1;
-    const reminderToAdd: Reminder = { ...this.newReminder, id: newId };
-    reminderToAdd.periodicity = reminderToAdd.weekly ? 'weekly' : 'none';
-    this.reminders.push(reminderToAdd);
+    this.reminderManager.addReminder(this.newReminder)
+    this.updateReminderList();
     this.closeNewReminderModal();
   }
-
   // Funciones para el modal de edición
   openEditReminder(reminder: Reminder): void {
     // Evita abrir el modal si se encuentra en estado de swipe
@@ -114,7 +76,14 @@ export class ReminderComponent implements OnInit {
 
   deleteReminder(reminder: Reminder): void {
     this.reminders = this.reminders.filter(r => r.id !== reminder.id);
+    this.reminderManager.deleteReminder(reminder);
     this.swipedReminderId = null;
+  }
+
+  private updateReminderList(): void {
+    this.reminderManager.getReminders().then((reminders: Reminder[]) => {
+      this.reminders = reminders;
+    })
   }
 
   // Handlers para detectar el swipe (movimiento táctil)

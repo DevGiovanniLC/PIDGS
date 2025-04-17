@@ -2,8 +2,7 @@ export type Reminder = {
   id: number;
   title: string;
   description: string;
-  date: Date;
+  date: string;
   periodicity?: string; // Ejemplo: 'none', 'daily', 'weekly', 'monthly'
-  isCompleted: boolean;
-  isArchived: boolean;
+  weekly?: boolean; // Solo si periodicity es 'weekly'
 }
